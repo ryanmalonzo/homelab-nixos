@@ -6,9 +6,20 @@
   };
 
   outputs = { self, nixpkgs }: {
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [ ./configuration.nix ];
+    colmena = {
+      meta = {
+        nixpkgs = import nixpkgs { system = "x86_64-linux"; };
+      };
+
+      nixos = {
+        deployment.targetHost = "192.168.1.80";
+        deployment.targetUser = "ryan";
+
+        imports = [
+          ./hosts/nixos/configuration.nix
+          ./hosts/nixos/hardware-configuration.nix
+        ];
+      };
     };
   };
 }
