@@ -3,10 +3,18 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
   };
 
   outputs =
-    { self, nixpkgs }:
+    {
+      nixpkgs,
+      quadlet-nix,
+      home-manager,
+      ...
+    }:
     {
       colmena = {
         meta = {
@@ -21,7 +29,13 @@
           imports = [
             ./hosts/nixos/configuration.nix
             ./hosts/nixos/hardware-configuration.nix
+            home-manager.nixosModules.home-manager
+            quadlet-nix.nixosModules.quadlet
           ];
+
+          _module.args = {
+            inherit quadlet-nix;
+          };
         };
       };
     };

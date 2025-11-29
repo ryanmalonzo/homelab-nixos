@@ -1,6 +1,5 @@
 {
-  config,
-  lib,
+  quadlet-nix,
   pkgs,
   ...
 }:
@@ -8,13 +7,9 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./services/nginx.nix
   ];
 
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-  };
+  virtualisation.quadlet.enable = true;
 
   system.stateVersion = "25.05"; # Do not edit
 
@@ -38,7 +33,31 @@
     ];
     shell = pkgs.zsh;
     home = "/home/ryan";
+    linger = true;
+    autoSubUidGidRange = true;
   };
+
+  home-manager.users.ryan = {
+    imports = [ quadlet-nix.homeManagerModules.quadlet ];
+
+    home.stateVersion = "25.05"; # Do not edit
+
+    virtualisation.quadlet.containers = {
+      nginx = {
+        autoStart = true;
+        serviceConfig = {
+          RestartSec = "10";
+          Restart = "always";
+        };
+        containerConfig = {
+          image = "docker.io/library/nginx:latest";
+          publishPorts = [ "8080:80" ];
+        };
+      };
+    };
+  };
+
+  networking.firewall.allowedTCPPorts = [ 8080 ];
 
   environment.systemPackages = with pkgs; [
     git
