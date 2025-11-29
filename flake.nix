@@ -14,6 +14,7 @@
       nixos = {
         deployment.targetHost = "192.168.1.80";
         deployment.targetUser = "ryan";
+        deployment.buildOnTarget = true;
 
         imports = [
           ./hosts/nixos/configuration.nix
