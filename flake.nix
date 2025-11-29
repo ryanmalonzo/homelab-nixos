@@ -12,7 +12,7 @@
       };
 
       nixos = {
-        deployment.targetHost = "192.168.1.80";
+        deployment.targetHost = "homelab-nixos";
         deployment.targetUser = "ryan";
         deployment.buildOnTarget = true;
 
