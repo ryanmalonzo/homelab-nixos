@@ -50,8 +50,9 @@
           Restart = "always";
         };
         containerConfig = {
-          image = "docker.io/library/nginx:latest";
-          publishPorts = [ "8080:80" ];
+          image = "docker.io/nginxinc/nginx-unprivileged:latest";
+          publishPorts = [ "8080:8080" ];
+          userns = "keep-id";
         };
       };
     };
