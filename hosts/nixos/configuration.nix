@@ -16,6 +16,10 @@
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
 
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_unprivileged_port_start" = 53;
+  };
+
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
@@ -43,19 +47,6 @@
     home.stateVersion = "25.05"; # Do not edit
 
     virtualisation.quadlet.containers = {
-      nginx = {
-        autoStart = true;
-        serviceConfig = {
-          RestartSec = "10";
-          Restart = "always";
-        };
-        containerConfig = {
-          image = "docker.io/nginxinc/nginx-unprivileged:latest";
-          publishPorts = [ "8080:8080" ];
-          userns = "keep-id";
-        };
-      };
-
       jellyfin = {
         autoStart = true;
         serviceConfig = {
@@ -73,10 +64,37 @@
           ];
         };
       };
+
+      adguard = {
+        autoStart = true;
+        serviceConfig = {
+          RestartSec = "10";
+          Restart = "always";
+        };
+        containerConfig = {
+          image = "docker.io/adguard/adguardhome:latest";
+          publishPorts = [
+            "53:53/tcp"
+            "53:53/udp"
+            "3000:3000/tcp"
+            "8080:80/tcp"
+          ];
+          volumes = [
+            "adguard-work:/opt/adguardhome/work:Z"
+            "adguard-conf:/opt/adguardhome/conf:Z"
+          ];
+        };
+      };
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 8080 8096 ];
+  networking.firewall.allowedTCPPorts = [
+    53
+    3000
+    8080
+    8096
+  ];
+  networking.firewall.allowedUDPPorts = [ 53 ];
 
   environment.systemPackages = with pkgs; [
     git
